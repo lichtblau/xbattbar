@@ -30,8 +30,12 @@ static char *ReleaseVersion="1.4.2";
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #include <X11/Xlib.h>
 
 #define PollingInterval 10	/* APM polling interval in sec */
@@ -654,7 +658,58 @@ typedef struct apm_info {
 
 
 int first = 1;
-void battery_check(void)
+
+#define SYS_CAPACITY "/sys/class/power_supply/battery/capacity"
+#define SYS_STATUS   "/sys/class/power_supply/battery/status"
+
+static void battery_check_sys(void)
+{
+  int r,p;
+  FILE *pt;
+  int percentage;
+  int charging;
+  struct apm_info i;
+  char buf[100];
+
+  /* get current status */
+  if ( (pt = fopen( SYS_CAPACITY, "r" )) == NULL) {
+    fprintf(stderr, "xbattbar: Can't read %s: %s\n",
+	    SYS_CAPACITY, strerror(errno));
+    exit(1);
+  }
+  fgets( buf, sizeof( buf ) - 1, pt );
+  buf[ sizeof( buf ) - 1 ] = '\0';
+  sscanf(buf, "%d\n", &percentage);
+  fclose (pt);
+
+  if ( (pt = fopen( SYS_STATUS, "r" )) == NULL) {
+    fprintf(stderr, "xbattbar: Can't read %s: %s\n",
+	    SYS_STATUS, strerror(errno));
+    exit(1);
+  }
+  fgets( buf, sizeof( buf ) - 1, pt );
+  charging = strncmp(buf, "Charging\n", sizeof(buf)) == 0;
+  fclose (pt);
+
+  ++elapsed_time;
+
+  /* some APM BIOSes return values slightly > 100 */
+  if ( percentage > 100 )
+    percentage = 100;
+
+  /* get AC-line status */
+  p = charging ? APM_STAT_LINE_ON : APM_STAT_LINE_OFF;
+
+  if (first || ac_line != p || battery_level != percentage) {
+    first = 0;
+    ac_line = p;
+    battery_level = percentage;
+    redraw();
+  }
+  signal(SIGALRM, (void *)(battery_check));
+}
+
+static void battery_check_apm(void)
 {
   int r,p;
   FILE *pt;
@@ -706,6 +761,19 @@ void battery_check(void)
     redraw();
   }
   signal(SIGALRM, (void *)(battery_check));
+}
+
+void battery_check(void)
+{
+  struct stat st;
+  if (lstat(APM_PROC, &st) != -1)
+    battery_check_apm();
+  else if (lstat(SYS_CAPACITY, &st) != -1)
+    battery_check_sys();
+  else {
+    fprintf(stderr, "xbattbar: Neither apm nor power_supply files found\n");
+    exit(1);
+  }
 }
 
 #endif /* linux */
