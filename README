@@ -1,0 +1,73 @@
+RELEASE NOTES						Febraury-2-2001
+
+Suguru Yamaguchi <suguru@wide.ad.jp>
+
+This directory contains source for the X11 version of xbattbar (version 1.4.2)
+which is a (laptop) battery status indicator.
+
+* Version
+
+The release version of this xbattbar is 1.4.2
+
+Some of command line options of this release are not compatible with
+its old versions such as 1.1 and 1.2.  If you are currently using such
+old versions of xbattbar, Please consult the manual page of this
+version.
+
+* Supported platform
+
+We tested this program on:
+
+	BSDI's BSD/os	3.0, 3.1
+	FreeBSD		2.2.x, 3.x, 4.0, 4.1
+	NetBSD		1.3, 1.3.2
+	Linux		2.2
+
+* Installation Procedure
+
+It's almost the same as cases for normal X window applications:
+
+xmkmf -a
+make
+make install
+make install.man
+
+* Known bugs and installation hints
+
+1. This program doesn't work well with the virtual desktop environment
+provided by several window managers such as fvwm; especially in the
+case that you use an 'EdgeScroll' feature, this program corrupts with
+it, because this program instead of your window manager catches mouse
+events to show xbattbar dialogue box.
+
+2. This program may happen to get X protocol error from X servers, and
+then terminate illeagally.  Especially in the case we repeat "launch
+and kill" of this program very rapidly, this case may happen.
+I guess this problem is caused by the X server internals.
+
+3. In the standard configuration of FreeBSD 2.x and 3.x, since the APM
+device /dev/apm is protected by mode 664 with owner "root" and group
+"operator", this program have to be installed with root.operator and
+mode 2555 (I prefer to use SetGID operator instead of SUID root for
+security considerations).
+
+4. In the case you plug off your AC line during battery status window
+is poped up, the battery status window is not updated, because I do
+not put any code to sense the battery status during the window is
+poped up.  You may think this is a bug, but I don't care (sorry!).
+
+* Comments, Suggestions, and Bug Reports
+
+Please send e-mail to Suguru Yamaguchi <suguru@wide.ad.jp>
+
+* Developers
+
+Suguru Yamaguchi	base development and releasing
+Akira Kato		function enhancements
+Noriyuki Shigechika	function enhancements
+Susumu Sano		FreeBSD porting
+Hiroshi Ura		NetBSD porting
+Yuji Sekiya		Linux porting
+
+------
+$Id: README,v 1.8.2.4 2001/02/02 05:25:28 suguru Exp $

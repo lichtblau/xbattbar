@@ -1,0 +1,100 @@
+.\"
+.\" $Id: xbattbar.man,v 1.13.2.1 2001/02/02 05:25:29 suguru Exp $
+.\"
+.\" Copyright (c) 1998-2001 Suguru Yamaguchi <suguru@wide.ad.jp>
+.\"
+.\" This program is free software; you can redistribute it and/or modify it
+.\" under the terms of the GNU General Public License as published
+.\" by the Free Software Foundation; either version 2 of the License, or (at
+.\" your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful, but
+.\" WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+.\" General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public
+.\" License along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.Dd December 5, 1998
+.Dt XBATTBAR 1
+.Os
+.Sh NAME
+.Nm xbattbar
+.Nd show battery status in X Window
+.Sh SYNOPSIS
+.Nm xbattbar
+.Op Fl a 
+.Op Fl t Ar thickness
+.Op Fl p Ar interval
+.Op Fl I Ar color
+.Op Fl O Ar color
+.Op Fl i Ar color
+.Op Fl o Ar color
+.Op Ar top | bottom | left | right
+.Sh DESCRIPTION
+.Nm xbattbar
+shows the current (laptop) battery status in the X window environment.
+Battery status is obtained through the APM kernel module.
+The APM kernel module depends on your UNIX platform,
+therefore, consult your documentation for its detail.
+.Pp
+.Nm xbattbar
+shows its battery status in a simple bar indicator.
+.Nm -a
+option makes the indicator window keep always on top of your screen.
+The thickness of the indicator is 3 pixels in default and
+you can set the thickness as a parameter of 
+.Nm -t
+option.
+This indicator is appeared in the bottom of the display, as its default.
+The option
+.Nm top,
+.Nm left,
+or
+.Nm right
+forces the status indicator to be at the top, left, and right of the
+display,
+respectively.
+Though it's a default, you can also use
+.Nm buttom
+as the option.
+.Pp
+In the case the AC line is on-line (plugged in),
+its color of the bar indicator consists of "green" and "olive drab"
+portions.
+The "green" portion shows its battery charging level.
+These colors can be changed by
+.Nm -I
+and
+.Nm -O
+options.
+In the other case (AC line is off-line),
+the "blue" portion of the bar indicator shows the percentage of
+its remaining battery level.
+The color conbination for the AC off-line case can be changed by
+.Nm -i
+and
+.Nm -o
+options.
+.Pp
+.Nm xbattbar
+trys to know its battery status in every 10 seconds in default.
+This is achived by APM polling.
+.Nm -p
+option sets the polling interval in second.
+.Pp
+If the mouse cursor enters in the status indicator,
+the diagnosis window appears in the center of the display,
+which shows both AC line status and battery remaining level.
+This diagnosis window disappears if the mouse cursor leaves from
+the status indicator.
+.Sh SEE ALSO
+.Xr xbatt 1
+\- an official battery status check command on BSD/OS 3.0,
+(but it's not fancy).
+.Sh AUTHOR
+Suguru Yamaguchi <suguru@wide.ad.jp>,
+Akira Kato <kato@wide.ad.jp>,
+Noriyuki Shigechika <nazo@wide.ad.jp>
